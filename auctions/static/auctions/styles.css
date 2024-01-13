@@ -1,3 +1,17 @@
 body {
     padding: 10px;
 }
+
+.comment {
+    background-color: #212529;
+    border: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);   
+}
+
+.comment:focus {
+    background-color: #212529;
+    color: #fff;
+    border: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);   
+    box-shadow: none;
+}

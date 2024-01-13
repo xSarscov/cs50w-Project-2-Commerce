@@ -6,7 +6,8 @@
     {% if listings %}
 
         {% for listing in listings %}
-            <div class="card" style="width: 18rem;">
+        <div class="card " style="width: 18rem;">
+            <a class="text-decoration-none" href="{% url 'listing_details' listing.id %}">
                 <img src="{{ listing.image }}" class="card-img-top" alt="{{ listing.title }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ listing.title }}</h5>
@@ -16,7 +17,8 @@
                     <p class="card-text">{{ listing.user.username }}</p>
                     <p class="card-text">{{ listing.created_at }}</p>
                 </div>
-            </div>
+            </a>
+        </div>
         {% endfor %}
 
     {% endif %}

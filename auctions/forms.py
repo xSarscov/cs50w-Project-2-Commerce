@@ -37,3 +37,16 @@ class CreateListingForm(forms.Form):
         choices = [(str(category.id), category.category_name) for category in categories]
 
         self.fields['category'].choices = choices
+
+class CreateBidForm(forms.Form):
+    bid = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'Make an offer'
+    }), label='Your offer')
+
+class CommentsForm(forms.Form):
+    comment = forms.CharField(widget=forms.Textarea(attrs={
+        'class': 'form-control comment rounded-0',
+        'rows': 1,
+        'placeholder': 'Post comment',
+    }))

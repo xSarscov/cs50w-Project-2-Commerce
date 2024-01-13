@@ -1,0 +1,37 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>Watchlist</h2>
+
+    {% if watchlist %}
+
+        {% for listing in watchlist.listing.all %}
+        <div class="card " style="width: 18rem;">
+            <a class="text-decoration-none" href="{% url 'listing_details' listing.id %}">
+                <img src="{{ listing.image }}" class="card-img-top" alt="{{ listing.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ listing.title }}</h5>
+                    <p class="card-text">{{ listing.description }}</p>
+                    <p class="card-text">{{ listing.category_name }}</p>
+                    <p class="card-text">US ${{ listing.price }}</p>
+                    <p class="card-text">{{ listing.user.username }}</p>
+                    <p class="card-text">{{ listing.created_at }}</p>
+                </div>
+            </a>
+            <div class="card-body">
+                <form action="{% url 'remove_watchlist' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                            <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                        </svg>
+                        Remove from watchlist
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <h3>No listings have been added to your watchlist yet</h3>
+    {% endif %}
+{% endblock %}

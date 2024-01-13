@@ -1,0 +1,184 @@
+{% extends "auctions/layout.html" %}
+
+{% load static %}
+
+{% block body %}
+
+    {% if listing %}
+        <h2> {{ listing.title }} </h2>
+
+        <div class="card mb-3" style="max-width: 780px;">
+            <div class="row g-0">
+                <div class="col-md-4 d-flex align-items-center">
+                    <img src="{{ listing.image }}" class="img-fluid rounded-start" alt="{{ listing.title }}">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ listing.title }}</h5>
+                        <p class="card-text">{{ listing.description }}</p>
+                        <p class="card-text"><strong>Price: US ${{ listing.price }}</strong></p>
+
+                        {% if best_bid %}
+                        <p class="card-text"> <strong>Current bid:</strong> ${{ best_bid.amount }}</p>
+                        {% else %}
+                        <p class="card-text"><small>Be the first to bid!</small></p>
+                        {% endif %}
+
+                        {% if total_bids != 0 %}
+                        <p class="card-text text-muted">{{ total_bids }} offers</p>
+                        {% else %}
+                        <p class="card-text text-muted">{{ total_bids }} offer</p>
+                        {% endif %}
+
+                        
+                        <p class="card-text"><small class="text-body-secondary">Created on {{ listing.created_at }}</small></p>
+
+                        {% if winner %}
+                        <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                            This item has been sold to {{ winner.user.username }} for {{ winner.amount }}
+                        </div>
+                        {% endif %}
+
+                        {% if listing.is_active %}
+                        <div class="d-flex gap-3">
+                                {% if listing.user == request.user %}
+                                <form action="{% url 'close_auction' listing.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">Close auction</button>
+                                </form>
+                                {% else %}
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" >
+                                    Make an offer
+                                </button>
+                                {% endif %}
+                            {% else %}
+                                {% if listing.user == request.user %}
+                                <form action="{% url 'open_auction' listing.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success">Open auction</button>
+                                </form>
+                                {% endif %}               
+                            {% endif %}
+
+                            {% if in_watchlist %}
+                            <form action="{% url 'remove_watchlist' listing.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                                    </svg>
+                                    Remove from watchlist
+                                </button>
+                            </form>
+                            {% else %}
+                            <form action="{% url 'add_watchlist' listing.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-secondary">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-heart" viewBox="0 0 16 16">
+                                        <path d="m8 2.748-.717-.737C5.6.281 2.514.878 1.4 3.053c-.523 1.023-.641 2.5.314 4.385.92 1.815 2.834 3.989 6.286 6.357 3.452-2.368 5.365-4.542 6.286-6.357.955-1.886.838-3.362.314-4.385C13.486.878 10.4.28 8.717 2.01zM8 15C-7.333 4.868 3.279-3.04 7.824 1.143q.09.083.176.171a3 3 0 0 1 .176-.17C12.72-3.042 23.333 4.867 8 15"/>
+                                    </svg>
+                                    Add to watchlist
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+
+                        <div class="modal {% if form.errors or error %}hasError{% endif %}" id="exampleModal" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Make your offer</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <form method="post">
+                                        {% csrf_token %}
+                                        <div class="modal-body">
+                                            <label for="{{ form.bid.id_for_label }}">{{ form.bid.label }}</label>
+                                            {{ form.bid }}
+                                            {% if form.bid.errors %}
+                                                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                                                    {{ form.bid.errors | striptags }}
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                                </div>
+                                            {% endif %}
+
+                                            {% if error %}
+                                            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                                                {{ error }}
+                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Send</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section style="background-color: #212529;">
+            <div class="comment-section">
+                <div class="row d-flex w-100 mx-0">
+                    <div class="col-md-12 col-lg-12 px-0">
+                        <div class="card text-bg-dark">
+                            <div class="card-body">
+                                <h4 class="mb-3">{{ total_comments }} comments</h4>
+                                {% if comment_form.comment.errors %}
+                                <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                                    {{ comment_form.comment.errors | striptags }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                                {% endif %}
+                                <form type="submit" action="{% url 'add_comment' listing.id %}" method="post">
+                                    {% csrf_token  %}
+                                    <label for="{{ comment_form.comment.id_for_label }}">{{ comment_form.comment.label }}</label>
+                                    {{ comment_form.comment }}
+                                    <button class="btn btn-primary mt-2
+                                    ">Post comment</button>
+                                </form>
+                            </div>
+                            
+                            {% if comments %}
+                            {% for comment in comments %}
+                            <div class="card-body">
+                                
+                                <div class="d-flex flex-start">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" fill="currentColor" class="bi bi-person-circle" viewBox="0 0 16 16">
+                                        <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                                        <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1"/>
+                                    </svg>
+                                    <div class="ms-3">
+                                        <h6 class="fw-bold mb-1"> <small>{{ comment.user.username }}</small></h6>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <p class="mb-0"> <small>{{ comment.created_at }}</small>
+                                            </p>
+                                            
+                                        </div>
+                                        <p class="mb-0">
+                                           {{ comment.content }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                            {% endif %}
+                
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    {% endif %}
+    
+    <script src="{% static 'auctions/listing_details.js' %}"></script>
+    
+    
+{% endblock %}
