@@ -11,7 +11,7 @@ from .forms import CreateListingForm, CreateBidForm, CommentsForm
 
 
 def index(request):
-    listings = Listing.objects.all()
+    listings = Listing.objects.filter(is_active=True)
     return render(request, "auctions/index.html", {
         "listings": listings
     })
@@ -66,7 +66,7 @@ def listing_details(request, listing_id):
             try:
                 bid = Decimal(bid)
 
-                if bid > best_bid.amount and bid > listing.price:
+                if best_bid and bid > best_bid.amount and bid > listing.price or bid > listing.price:
                     offer = Bid(amount=bid, listing=listing, user=request.user)
                     offer.save()
                     return redirect('listing_details', listing_id=listing_id)
@@ -189,6 +189,18 @@ def open_auction(request, listing_id):
         listing.save()
 
         return redirect('listing_details', listing_id=listing_id)
+    
+def categories(request):
+    categories = Category.objects.all()
+    return render(request, "auctions/categories.html", {
+        "categories": categories
+        })
+
+def category_details(request, category_id):
+    listings = Listing.objects.filter(category=category_id)
+    return render(request, "auctions/category_details.html", {
+        "listings": listings
+    })
 
 # Auth
 def login_view(request):

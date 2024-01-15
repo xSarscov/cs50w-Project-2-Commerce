@@ -1,14 +1,14 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+{% if listings %}
+    <h2>{{ listings.0.category.category_name }}</h2>
 
-    {% if listings %}
 
-    <div class="d-flex gap-2">
         {% for listing in listings %}
+        <div class="d-flex flex-column gap-2">
 
-            <div class="card " style="width: 20rem;">
+            <div class="card " style="width: 18rem;">
                 <a class="text-decoration-none" href="{% url 'listing_details' listing.id %}">
                     <img src="{{ listing.image }}" class="card-img-top" alt="{{ listing.title }}">
                     <div class="card-body">
@@ -21,8 +21,8 @@
                     </div>
                 </a>
             </div>
-            {% endfor %}
         </div>
-
+        {% endfor %}
+        
     {% endif %}
 {% endblock %}

@@ -17,7 +17,7 @@
                         <h5 class="card-title">{{ listing.title }}</h5>
                         <p class="card-text">{{ listing.description }}</p>
                         <p class="card-text"><strong>Price: US ${{ listing.price }}</strong></p>
-
+                        <p class="card-text">Listed by {{ listing.user.username }}</p>
                         {% if best_bid %}
                         <p class="card-text"> <strong>Current bid:</strong> ${{ best_bid.amount }}</p>
                         {% else %}
@@ -35,7 +35,7 @@
 
                         {% if winner %}
                         <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
-                            This item has been sold to {{ winner.user.username }} for {{ winner.amount }}
+                            This item has been sold to {{ winner.user.username }} for US ${{ winner.amount }}
                         </div>
                         {% endif %}
 
@@ -52,7 +52,7 @@
                                 </button>
                                 {% endif %}
                             {% else %}
-                                {% if listing.user == request.user %}
+                                {% if listing.user == request.user and listing.is_active %}
                                 <form action="{% url 'open_auction' listing.id %}" method="post">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-success">Open auction</button>
